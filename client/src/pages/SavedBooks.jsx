@@ -7,6 +7,10 @@ import {
   Col
 } from 'react-bootstrap';
 
+
+//use the useQuery() Hook to execute the GET_ME query 
+//on load and save it to a variable named userData.
+
 import { useMutation, useQuery } from '@apollo/client';
 import { REMOVE_BOOK} from '../utils/mutations';
 import { GET_ME } from '../utils/queries';
@@ -16,9 +20,11 @@ import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
 
 const SavedBooks = () => {
-  const [ me, {error}] = useQuery(GET_ME);
+  const { loading, data } = useQuery(GET_ME);
+  const [removeBook, {error}] = useMutation(REMOVE_BOOK);
 
-  const { userData} = me({})
+  const userData = data?.me || {};
+  
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
@@ -27,17 +33,12 @@ const SavedBooks = () => {
     if (!token) {
       return false;
     }
+    
 
     try {
-      //const response = await deleteBook(bookId, token);
-      const response = await useMutation(REMOVE_BOOK);
-
-      if (!response.ok) {
-        throw new Error('something went wrong!');
-      }
-
-      const updatedUser = await response.json();
-      setUserData(updatedUser);
+     const {data} = await removeBook({
+      variables: {bookId},
+     });
       // upon success, remove book's id from localStorage
       removeBookId(bookId);
     } catch (err) {
@@ -46,7 +47,7 @@ const SavedBooks = () => {
   };
 
   // if data isn't here yet, say so
-  if (!userDataLength) {
+  if (loading) {
     return <h2>LOADING...</h2>;
   }
 

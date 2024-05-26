@@ -154,6 +154,3 @@ const SearchBooks = () => {
 };
 
 export default SearchBooks;
-
-//Below was formerly line 77:
-//const response = await saveBook(bookToSave, token);
