@@ -8,43 +8,17 @@ import {
 } from 'react-bootstrap';
 
 import { useMutation, useQuery } from '@apollo/client';
-import { REMOVE_BOOK, GET_ME } from '../utils/mutations';
+import { REMOVE_BOOK} from '../utils/mutations';
+import { GET_ME } from '../utils/queries';
 
-import { getMe, deleteBook } from '../utils/API';
+// import { getMe, deleteBook } from '../utils/API';
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
 
 const SavedBooks = () => {
-  const [userData, setUserData] = useState({});
+  const [ me, {error}] = useQuery(GET_ME);
 
-  // use this to determine if `useEffect()` hook needs to run again
-  const userDataLength = Object.keys(userData).length;
-
-  //useEffect(() => {
-  useQuery((GET_ME) => {
-    const getUserData = async () => {
-      try {
-        const token = Auth.loggedIn() ? Auth.getToken() : null;
-
-        if (!token) {
-          return false;
-        }
-
-        const response = await getMe(token);
-
-        if (!response.ok) {
-          throw new Error('something went wrong!');
-        }
-
-        const user = await response.json();
-        setUserData(user);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    getUserData();
-  }, [userDataLength]);
+  const { userData} = me({})
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
@@ -114,3 +88,36 @@ const SavedBooks = () => {
 };
 
 export default SavedBooks;
+
+//Below was from const SavedBooks()
+
+// const [userData, setUserData] = useState({});
+
+// // use this to determine if `useEffect()` hook needs to run again
+// const userDataLength = Object.keys(userData).length;
+
+// //useEffect(() => {
+// useQuery((GET_ME) => {
+//   const getUserData = async () => {
+//     try {
+//       const token = Auth.loggedIn() ? Auth.getToken() : null;
+
+//       if (!token) {
+//         return false;
+//       }
+
+//       const response = await getMe(token);
+
+//       if (!response.ok) {
+//         throw new Error('something went wrong!');
+//       }
+
+//       const user = await response.json();
+//       setUserData(user);
+//     } catch (err) {
+//       console.error(err);
+//     }
+//   };
+
+//   getUserData();
+// }, [userDataLength]);

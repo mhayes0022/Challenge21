@@ -1,4 +1,5 @@
 // import user model
+const { argsToArgsConfig } = require('graphql/type/definition');
 const { User } = require('../models');
 // import sign token function from auth
 const { signToken, AuthenticationError } = require('../utils/auth');
@@ -10,38 +11,33 @@ const { signToken, AuthenticationError } = require('../utils/auth');
 
 const resolvers = {
     Query: {
-        users: async () => {
-            return User.find();
-        },
+        me: async (parent, args, context) => {
+            if (context.user) {
+                return User.findOne({ _id: context.user._id })
+            }
+            throw AuthenticationError
 
-        user: async (parent, { userId, username }) => {
-            if (user) {
-                return User.findOne({ _id: userId });
-              }
-              return User.findOne({ username });
-        },
+        }
     },
 
     // create a user, sign a token, and ? send it back (to client/src/components/SignUpForm.js)
     //Do I need username, email, password below? Or just 'body' like in user-controller.js?
     Mutation: {
-        addUser: async (parent, { username, email, password }) => {
-            const user = await User.create({ username, email, password });
+        addUser: async (parent, args) => {
+            const user = await User.create(args);
             const token = signToken(user);
 
             return { user, token };
         },
 
-        login: async (parent, { username, email, password }) => {
-            const user = await User.findOne({username});
-            //Should be finding ONE user via username OR email here
+        login: async (parent, { email, password }) => {
+            const user = await User.findOne({ email });
+            //Should be finding ONE user via  email here
+
             if (!user) {
                 throw AuthenticationError;
             }
 
-            if (!email) {
-                throw AuthenticationError;
-            }
 
             const correctPw = await user.isCorrectPassword(password);
 
@@ -54,12 +50,12 @@ const resolvers = {
         },
 
         //Below: book? bookId?
-        saveBook: async (parent,{ userId, bookId }, context) => {
+        saveBook: async (parent, { content }, context) => {
             if (context.user) {
                 return User.findOneAndUpdate(
-                    { _id: userId },
+                    { _id: context.user._id },
                     {
-                        $addToSet: { books: book },
+                        $addToSet: { savedBooks: content },
                     },
                     {
                         new: true,
@@ -70,11 +66,11 @@ const resolvers = {
             throw AuthenticationError;
         },
 
-        removeBook: async (parent, { book }, context) => {
+        removeBook: async (parent, { bookId }, context) => {
             if (context.user) {
                 return User.findOneAndUpdate(
                     { _id: context.user._id },
-                    { $pull: { books: book } },
+                    { $pull: { savedBooks: { bookId } } },
                     { new: true }
                 );
             }
