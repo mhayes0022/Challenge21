@@ -44,16 +44,4 @@ function App() {
   );
 };
 
-
-//Below double commented out is what was original to challenge21
-
-// // function App() {
-// //   return (
-// //     <>
-// //       <Navbar />
-// //       <Outlet />
-// //     </>
-// //   );
-// // }
-
 export default App;

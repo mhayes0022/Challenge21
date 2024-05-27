@@ -1,6 +1,7 @@
+//import gql from the @apollo/client library to allow us to parse mutations and queries as template literals
 import { gql } from '@apollo/client';
 
-//Below has same issue as in the resolvers.js file: how do you make it email OR username?
+
 export const LOGIN_USER = gql`
 mutation login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
@@ -27,7 +28,6 @@ mutation addUser($username: String!, $email: String!, $password: String!) {
   }  
 `;
 
-//Below: not sure if the parameters are correct at all
 export const SAVE_BOOK = gql`
 mutation saveBook($content: BookContent!) {
     saveBook(content: $content) {

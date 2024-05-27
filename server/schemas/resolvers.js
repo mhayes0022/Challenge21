@@ -4,12 +4,9 @@ const { User } = require('../models');
 // import sign token function from auth
 const { signToken, AuthenticationError } = require('../utils/auth');
 
-//Question: Do I need to include the find all functionality then for users?
-
-//Find ONE user, create user, login, save book, delete book
-//No delete user?
-
+// Below creates the functions that fulfill the queries defined in `typeDefs.js`
 const resolvers = {
+    // Below returns a single user by id
     Query: {
         me: async (parent, args, context) => {
             if (context.user) {
@@ -19,9 +16,8 @@ const resolvers = {
 
         }
     },
-
-    // create a user, sign a token, and ? send it back (to client/src/components/SignUpForm.js)
-    //Do I need username, email, password below? Or just 'body' like in user-controller.js?
+    
+    //Below creates a new user
     Mutation: {
         addUser: async (parent, args) => {
             const user = await User.create(args);
@@ -30,9 +26,9 @@ const resolvers = {
             return { user, token };
         },
 
+        //Below signs in an existing user
         login: async (parent, { email, password }) => {
             const user = await User.findOne({ email });
-            //Should be finding ONE user via  email here
 
             if (!user) {
                 throw AuthenticationError;
@@ -49,7 +45,7 @@ const resolvers = {
             return { token, user };
         },
 
-        //Below: book? bookId?
+        //Below saves a book to a user's account
         saveBook: async (parent, { content }, context) => {
             if (context.user) {
                 return User.findOneAndUpdate(
@@ -66,6 +62,7 @@ const resolvers = {
             throw AuthenticationError;
         },
 
+        //Below removes a previously saved book from a users account
         removeBook: async (parent, { bookId }, context) => {
             if (context.user) {
                 return User.findOneAndUpdate(

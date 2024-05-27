@@ -1,3 +1,4 @@
+//import gql from the @apollo/client library to allow us to parse queries as template literals
 import { gql } from '@apollo/client';
 
 export const GET_ME = gql`
