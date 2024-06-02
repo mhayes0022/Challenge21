@@ -1,4 +1,4 @@
-# Challenge21: Book Search Engine
+# MERN Book Search Engine
 
 ## Page Description
 
